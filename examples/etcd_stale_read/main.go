@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/lmittmann/tint"
-	"github.com/sotnii/pakostii"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin"
+	"github.com/sotnii/raijin/spec"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -39,16 +39,16 @@ func main() {
 		)
 	}
 
-	test := pakostii.NewTest(
+	test := raijin.NewTest(
 		"etcd_stale_read",
 		cluster,
-		pakostii.WithLogger(slog.New(tint.NewHandler(os.Stdout, &tint.Options{
+		raijin.WithLogger(slog.New(tint.NewHandler(os.Stdout, &tint.Options{
 			Level: slog.LevelInfo,
 		}))),
 	)
 
 	testKey := "name"
-	test.Run(context.Background(), func(t *pakostii.TestHandle) error {
+	test.Run(context.Background(), func(t *raijin.TestHandle) error {
 		etcdEndpoints := make([]string, 0, len(etcdHosts))
 		for _, host := range etcdHosts {
 			fw, err := t.Network().ForwardPort(host, 2379)

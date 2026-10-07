@@ -4,13 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/sotnii/pakostii/internal/network"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/network"
+	"github.com/sotnii/raijin/spec"
 )
 
 const (
 	DefaultSocket      = "/run/containerd/containerd.sock"
-	DefaultNamespace   = "pakostii"
+	DefaultNamespace   = "raijin"
 	DefaultSnapshotter = "overlayfs"
 )
 

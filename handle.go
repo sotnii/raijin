@@ -1,14 +1,14 @@
-package pakostii
+package raijin
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/sotnii/pakostii/internal/runtime/agent"
-	"github.com/sotnii/pakostii/internal/runtime/api"
-	"github.com/sotnii/pakostii/internal/runtime/api/network"
-	"github.com/sotnii/pakostii/internal/runtime/managers"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/runtime/agent"
+	"github.com/sotnii/raijin/internal/runtime/api"
+	"github.com/sotnii/raijin/internal/runtime/api/network"
+	"github.com/sotnii/raijin/internal/runtime/managers"
+	"github.com/sotnii/raijin/spec"
 )
 
 type TestHandle struct {

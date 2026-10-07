@@ -1,9 +1,9 @@
-package pakostii
+package raijin
 
 import (
 	"log/slog"
 
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/spec"
 )
 
 type ClusterSpec = spec.ClusterSpec

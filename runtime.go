@@ -1,4 +1,4 @@
-package pakostii
+package raijin
 
 import (
 	"context"
@@ -13,13 +13,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sotnii/pakostii/internal/containers"
-	"github.com/sotnii/pakostii/internal/network"
-	"github.com/sotnii/pakostii/internal/runtime"
-	"github.com/sotnii/pakostii/internal/runtime/agent"
-	"github.com/sotnii/pakostii/internal/runtime/managers"
-	"github.com/sotnii/pakostii/internal/runtime/util"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/containers"
+	"github.com/sotnii/raijin/internal/network"
+	"github.com/sotnii/raijin/internal/runtime"
+	"github.com/sotnii/raijin/internal/runtime/agent"
+	"github.com/sotnii/raijin/internal/runtime/managers"
+	"github.com/sotnii/raijin/internal/runtime/util"
+	"github.com/sotnii/raijin/spec"
 	"github.com/vishvananda/netns"
 )
 
@@ -63,7 +63,7 @@ func (s *signalState) get() os.Signal {
 }
 
 func NewTestRuntime(name string, cluster spec.ClusterSpec, logger *slog.Logger) (*TestRuntime, error) {
-	workDir := filepath.Join(os.TempDir(), "pakostii")
+	workDir := filepath.Join(os.TempDir(), "raijin")
 	if err := os.MkdirAll(workDir, 0o755); err != nil {
 		return nil, fmt.Errorf("create work dir: %w", err)
 	}
@@ -75,7 +75,7 @@ func NewTestRuntime(name string, cluster spec.ClusterSpec, logger *slog.Logger) 
 
 	logger = logger.With("test_id", testId)
 
-	nsMgr, err := network.NewManager("pkst", network.ExecCommander{}, logger.With("component", "network"))
+	nsMgr, err := network.NewManager("rjn", network.ExecCommander{}, logger.With("component", "network"))
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func NewTestRuntime(name string, cluster spec.ClusterSpec, logger *slog.Logger) 
 		containers:   managers.NewContainerManager(containerRuntimeManager, logger),
 		network:      managers.NewNetworkManager(nsMgr, logger),
 		workDir:      workDir,
-		artifactsDir: filepath.Join(".pakostii", fmt.Sprintf("%s-%s", name, testId)),
+		artifactsDir: filepath.Join(".raijin", fmt.Sprintf("%s-%s", name, testId)),
 	}, nil
 }
 

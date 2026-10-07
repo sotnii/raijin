@@ -9,10 +9,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sotnii/pakostii/internal/containers"
-	"github.com/sotnii/pakostii/internal/network"
-	"github.com/sotnii/pakostii/internal/runtime/util"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/containers"
+	"github.com/sotnii/raijin/internal/network"
+	"github.com/sotnii/raijin/internal/runtime/util"
+	"github.com/sotnii/raijin/spec"
 )
 
 type NodeNetworkResolver interface {
@@ -117,7 +117,7 @@ func (p *ContainerManager) Prepare(ctx context.Context, clusterSpec spec.Cluster
 				defer p.launchWG.Done()
 
 				request := containers.LaunchRequest{
-					ID:          fmt.Sprintf("pkst-%s-%s-%s-%s", testId, nodeSpec.ID, containerSpec.Name, util.NewResourceID()),
+					ID:          fmt.Sprintf("rjn-%s-%s-%s-%s", testId, nodeSpec.ID, containerSpec.Name, util.NewResourceID()),
 					Name:        containerSpec.Name,
 					NodeID:      string(nodeSpec.ID),
 					ImageRef:    containerSpec.ImageRef,

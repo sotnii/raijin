@@ -1,4 +1,5 @@
 .idea
-.pakostii
+.raijin
 .build
 bpf/target
+.DS_Store

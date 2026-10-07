@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/sotnii/pakostii/internal/containers"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/containers"
+	"github.com/sotnii/raijin/spec"
 )
 
 type ContainerManager interface {

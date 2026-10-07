@@ -20,7 +20,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/typeurl/v2"
 	"github.com/opencontainers/runtime-spec/specs-go"
-	"github.com/sotnii/pakostii/internal/runtime/common"
+	"github.com/sotnii/raijin/internal/runtime/common"
 )
 
 type Config struct {
@@ -111,7 +111,7 @@ func (m *manager) RunContainer(ctx context.Context, req LaunchRequest) (*Running
 		containerd.WithNewSnapshot(snapshotKey, image),
 		containerd.WithImage(image),
 		containerd.WithContainerLabels(map[string]string{
-			"pakostii.node": req.NodeID,
+			"raijin.node": req.NodeID,
 		}),
 		containerd.WithNewSpec(
 			oci.WithImageConfig(image),

@@ -7,9 +7,9 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/sotnii/pakostii/internal/network"
-	"github.com/sotnii/pakostii/internal/runtime/util"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/network"
+	"github.com/sotnii/raijin/internal/runtime/util"
+	"github.com/sotnii/raijin/spec"
 )
 
 type NetworkManager struct {

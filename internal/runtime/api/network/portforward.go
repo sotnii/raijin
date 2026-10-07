@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/sotnii/pakostii/internal/runtime/agent"
+	"github.com/sotnii/raijin/internal/runtime/agent"
 )
 
 type PortForward struct {

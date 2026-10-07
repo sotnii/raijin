@@ -2,32 +2,41 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import starlightThemeFlexoki from "starlight-theme-flexoki";
+import lucode from "lucode-starlight";
 import mermaid from "astro-mermaid";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://sotnii.github.io",
-  base: "/pakostii",
+  base: "/raijin",
   integrations: [
     mermaid({
       theme: "forest",
       autoTheme: true,
     }),
     starlight({
-      title: "pakostii",
+      title: "raijin",
+      customCss: ["./src/styles/custom.css"],
       titleDelimiter: "|",
       favicon: "/favicon.svg",
       logo: {
-        src: "./src/assets/pkst-logo.svg",
+        dark: "./src/assets/rjn-dark.svg",
+        light: "./src/assets/rjn-light.svg",
       },
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/sotnii/pakostii",
+          href: "https://github.com/sotnii/raijin",
         },
       ],
-      plugins: [starlightThemeFlexoki({ accentColor: "blue" })],
+      plugins: [
+        lucode({
+          docs: {
+            includeAiUtilities: true,
+          },
+        }),
+      ],
       sidebar: [
         {
           label: "Start here",

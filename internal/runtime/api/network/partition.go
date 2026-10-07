@@ -7,10 +7,10 @@ import (
 	"net"
 	"sync"
 
-	"github.com/sotnii/pakostii/internal/network"
-	"github.com/sotnii/pakostii/internal/runtime/bpf"
-	"github.com/sotnii/pakostii/internal/runtime/util"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/network"
+	"github.com/sotnii/raijin/internal/runtime/bpf"
+	"github.com/sotnii/raijin/internal/runtime/util"
+	"github.com/sotnii/raijin/spec"
 )
 
 type Partition struct {

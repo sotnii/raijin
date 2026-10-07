@@ -16,5 +16,5 @@ bpf:
     cp bpf/target/bpfel-unknown-none/release/xdp-packet-drop {{bpfAssetsDir}}/xdp-packet-drop.bpf.o
 
 nuke:
-    sudo ./scripts/nuke_ctr_namespace.sh pakostii || true
+    sudo ./scripts/nuke_ctr_namespace.sh raijin || true
     sudo ./scripts/nuke_veths.sh

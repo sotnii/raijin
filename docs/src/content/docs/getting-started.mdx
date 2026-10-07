@@ -1,46 +1,48 @@
 ---
 title: Getting started
-description: Getting started with pakostii
+description: Getting started with raijin
 ---
 
 In this guide, we'll build a test that allows us to observe how a serializable read can return stale data when a node
-is separated from the majority of the cluster. You will learn how to set up a pakostii cluster,
+is separated from the majority of the cluster. You will learn how to set up a raijin cluster,
 apply network isolation faults and interact with cluster members via HTTP.
 
 ## Prerequisites
 
 Before you begin, ensure you have the following prerequisites:
+
 - Go version is at least 1.26.2
 - You are working on Linux with a kernel version >= 5.9 and BPF/XDP enabled for tests that use network isolation faults.
 - Containerd v2 is installed and running on your system.
 - You have ability to run programs as root with `sudo`.
 
-
-import { Aside } from '@astrojs/starlight/components';
+import { Aside } from "@astrojs/starlight/components";
 
 <Aside type="note" title="Why do I need sudo?">
-    Pakostii interfaces with Linux Kernel, Networking stack and Containerd directly, which requires root access for operations like network provisioning,
+    raijin interfaces with Linux Kernel, Networking stack and Containerd directly, which requires root access for operations like network provisioning,
     container lifecycle management and fault injection.
 
-    Currently each test needs root access, but it is planned to have a dedicated pakostii daemon that will allow keeping test code in non-root user mode.
+    Currently each test needs root access, but it is planned to have a dedicated raijin daemon that will allow keeping test code in non-root user mode.
+
 </Aside>
 
 ## Setting up test project
-As of now, the only way to use pakostii is via the Go package and running each test as a standalone program.
+
+As of now, the only way to use raijin is via the Go package and running each test as a standalone program.
 This is something that will be addressed pretty soon, but anyway, let's proceed.
 
 First and foremost, we need to set up a Go project.
 
 ```bash
-mkdir pakostii-example
-cd pakostii-example
-go mod init pakostii-example
+mkdir raijin-example
+cd raijin-example
+go mod init raijin-example
 ```
 
-Then, we'll need to install pakostii itself.
+Then, we'll need to install raijin itself.
 
 ```bash
-go get github.com/sotnii/pakostii@latest
+go get github.com/sotnii/raijin@latest
 ```
 
 And for this particular test we will need the etcd client library.
@@ -51,17 +53,15 @@ go get github.com/etcd-io/etcd/client/v3
 
 That's it! We're ready to proceed with writing our first line of code.
 
-
 ## Creating a cluster and a basic test
 
-Actually, I lied a bit. Before we proceed with writing code, let's quickly go over how you tell pakostii what cluster to create.
+Actually, I lied a bit. Before we proceed with writing code, let's quickly go over how you tell raijin what cluster to create.
 
 Everything starts with a cluster specification that lets you define nodes. Each node is an abstraction over a Linux network namespace, which allows
 to simulate running programs on different network nodes. Each node can have one or multiple services (containers) running on it. Nodes may also belong
 to a particular availability zone (AZ), which comes in handy when simulating cross-AZ availability issues.
 
 The cluster we're trying to create can be illustrated as follows:
-
 
 ```mermaid
 architecture-beta
@@ -77,7 +77,7 @@ architecture-beta
     service etcd2(database)[etcd container] in network2
     service etcd3(database)[etcd container] in network3
 
-    service bridge(internet)[pakostii bridge] in api
+    service bridge(internet)[raijin bridge] in api
 
     etcd1:R -- L:bridge
     etcd2:L -- R:bridge
@@ -85,7 +85,7 @@ architecture-beta
 ```
 
 All we need to do to create a cluster like this is to define a cluster spec and add nodes with etcd services to it.
-Pakostii will take care of network and container provisioning for us.
+raijin will take care of network and container provisioning for us.
 
 ```go
 package main
@@ -95,8 +95,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sotnii/pakostii"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin"
+	"github.com/sotnii/raijin/spec"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -144,7 +144,7 @@ Let's proceed to creating the test environment.
 // ... Cluster spec creation ...
 
 // Besides the cluster spec, each test needs a name that is used to identify test runs later.
-test := pakostii.NewTest("etcd_stale_read", cluster)
+test := raijin.NewTest("etcd_stale_read", cluster)
 ```
 
 Now we're ready to run the test. Let's start simple.
@@ -152,58 +152,58 @@ Now we're ready to run the test. Let's start simple.
 ```go
 // ... Previous code ...
 
-test.Run(context.Background(), func(t *pakostii.TestHandle) error {
+test.Run(context.Background(), func(t *raijin.TestHandle) error {
 	t.Logger.Info("Hello, World!")
 	return nil
 })
 ```
 
-By calling `test.Run`, we instruct pakostii to provision the cluster and give control over the cluster to us.
+By calling `test.Run`, we instruct raijin to provision the cluster and give control over the cluster to us.
 Before we explore what we can do using the `TestHandle`, let's just log a message to make sure everything is working.
 
 ```bash
 # Build the example program
-go build -o pakostii-example main.go
+go build -o raijin-example main.go
 
-# Remember to run as root, otherwise pakostii
+# Remember to run as root, otherwise raijin
 # will not be able to provision the cluster
-sudo ./pakostii-example
+sudo ./raijin-example
 ```
 
-After that, you will see logs appearing in your terminal. You might have to wait a bit after the "preparing containers" logs for pakostii to download
+After that, you will see logs appearing in your terminal. You might have to wait a bit after the "preparing containers" logs for raijin to download
 and run your containers. Sequential runs will be faster once images are downloaded to your computer.
 
 ```log
-time=2026-05-10T11:24:55.257+03:00 level=INFO msg="runtime for test \"etcd_stale_read\" starting" test_id=zftsk nodes=3 artifacts_dir=.pakostii/etcd_stale_read-zftsk work_dir=/tmp/pakostii
+time=2026-05-10T11:24:55.257+03:00 level=INFO msg="runtime for test \"etcd_stale_read\" starting" test_id=zftsk nodes=3 artifacts_dir=.raijin/etcd_stale_read-zftsk work_dir=/tmp/raijin
 time=2026-05-10T11:24:55.258+03:00 level=INFO msg="preparing runtime" test_id=zftsk
 time=2026-05-10T11:24:55.258+03:00 level=INFO msg="preparing network" test_id=zftsk component=network_manager
-time=2026-05-10T11:24:55.326+03:00 level=INFO msg="network ready for node etcd1" test_id=zftsk component=network_manager namespace=pkst-node-vpxon ip=10.0.0.3
-time=2026-05-10T11:24:55.353+03:00 level=INFO msg="network ready for node etcd2" test_id=zftsk component=network_manager namespace=pkst-node-jfbyp ip=10.0.0.4
-time=2026-05-10T11:24:55.385+03:00 level=INFO msg="network ready for node etcd3" test_id=zftsk component=network_manager namespace=pkst-node-ssowi ip=10.0.0.5
+time=2026-05-10T11:24:55.326+03:00 level=INFO msg="network ready for node etcd1" test_id=zftsk component=network_manager namespace=rjn-node-vpxon ip=10.0.0.3
+time=2026-05-10T11:24:55.353+03:00 level=INFO msg="network ready for node etcd2" test_id=zftsk component=network_manager namespace=rjn-node-jfbyp ip=10.0.0.4
+time=2026-05-10T11:24:55.385+03:00 level=INFO msg="network ready for node etcd3" test_id=zftsk component=network_manager namespace=rjn-node-ssowi ip=10.0.0.5
 time=2026-05-10T11:24:55.385+03:00 level=INFO msg="preparing containers" test_id=zftsk component=container_manager
-time=2026-05-10T11:25:11.429+03:00 level=INFO msg="container running" test_id=zftsk component=container_manager node=etcd2 container_id=pkst-zftsk-etcd2-etcd-jjeve name=etcd
-time=2026-05-10T11:25:11.490+03:00 level=INFO msg="container running" test_id=zftsk component=container_manager node=etcd1 container_id=pkst-zftsk-etcd1-etcd-jzwde name=etcd
-time=2026-05-10T11:25:12.490+03:00 level=INFO msg="container running" test_id=zftsk component=container_manager node=etcd3 container_id=pkst-zftsk-etcd3-etcd-vlagp name=etcd
+time=2026-05-10T11:25:11.429+03:00 level=INFO msg="container running" test_id=zftsk component=container_manager node=etcd2 container_id=rjn-zftsk-etcd2-etcd-jjeve name=etcd
+time=2026-05-10T11:25:11.490+03:00 level=INFO msg="container running" test_id=zftsk component=container_manager node=etcd1 container_id=rjn-zftsk-etcd1-etcd-jzwde name=etcd
+time=2026-05-10T11:25:12.490+03:00 level=INFO msg="container running" test_id=zftsk component=container_manager node=etcd3 container_id=rjn-zftsk-etcd3-etcd-vlagp name=etcd
 time=2026-05-10T11:25:12.490+03:00 level=INFO msg="runtime ready" test_id=zftsk
 time=2026-05-10T11:25:12.490+03:00 level=INFO msg="starting test \"etcd_stale_read\"" test_id=zftsk
 time=2026-05-10T11:25:12.490+03:00 level=INFO msg="Hello, World!" test_id=zftsk
-time=2026-05-10T11:25:12.495+03:00 level=INFO msg="artifacts collected" test_id=zftsk destination=.pakostii/etcd_stale_read-zftsk
+time=2026-05-10T11:25:12.495+03:00 level=INFO msg="artifacts collected" test_id=zftsk destination=.raijin/etcd_stale_read-zftsk
 time=2026-05-10T11:25:12.495+03:00 level=INFO msg="tearing down runtime" test_id=zftsk
 time=2026-05-10T11:25:12.625+03:00 level=INFO msg="containers tore down" test_id=zftsk
 time=2026-05-10T11:25:12.630+03:00 level=INFO msg="network tore down" test_id=zftsk
 time=2026-05-10T11:25:12.630+03:00 level=INFO msg="test passed"
 ```
 
-By looking at the logs, we can see how pakostii provisions the network and runs containers. Once the environment is ready, the test is
+By looking at the logs, we can see how raijin provisions the network and runs containers. Once the environment is ready, the test is
 started and we can see our "Hello, World!" message logged as well. After that, our test returns `nil`, which means the test passed.
-Pakostii collects logs from the containers and tears down everything it created.
+raijin collects logs from the containers and tears down everything it created.
 
-The location for all test artifacts is `.pakostii` directory in the current working directory. Let's look at the general structure of the directory:
+The location for all test artifacts is `.raijin` directory in the current working directory. Let's look at the general structure of the directory:
 
-import { FileTree } from '@astrojs/starlight/components';
+import { FileTree } from "@astrojs/starlight/components";
 
 <FileTree>
-- .pakostii
+- .raijin
     - \<test-name\>-\<test-id\>
         - logs
             - \<node1-name\>
@@ -219,23 +219,22 @@ import { FileTree } from '@astrojs/starlight/components';
                     - stdout
 </FileTree>
 
-Each test has a unique test ID that is generated on every test run, you might have noticed the `test_id` field in the logs. Pakostii will use test name and
+Each test has a unique test ID that is generated on every test run, you might have noticed the `test_id` field in the logs. raijin will use test name and
 test ID to organize the logs for each test run.
-During runtime, pakostii collects stdin and stdout for each container and stores the logs for each service under the node directory the service belongs to.
+During runtime, raijin collects stdin and stdout for each container and stores the logs for each service under the node directory the service belongs to.
 
 With that out of the way, we are ready to explore what we can do during the test run.
-
 
 ## Port forwarding and etcd client setup
 
 We want to interact with the etcd instances using the Go etcd client library, but since all nodes in a cluster run in an
 isolated LAN that is not accessible from the host network by default, we will need to set up port forwarding for our etcd instances.
 
-To do that, we will use pakostii's `t.Network().ForwardPort()` API. For this test, we will only need to access `etcd1` and `etcd2`.
+To do that, we will use raijin's `t.Network().ForwardPort()` API. For this test, we will only need to access `etcd1` and `etcd2`.
 Replace your "Hello World!" log with the following code:
 
 ```go
-test.Run(context.Background(), func(t *pakostii.TestHandle) error {
+test.Run(context.Background(), func(t *raijin.TestHandle) error {
     clients := make([]*clientv3.Client, 2)
 	for _, host := range []string{"etcd1", "etcd2"} {
 		fw, err := t.Network().ForwardPort(host, 2379)
@@ -246,7 +245,7 @@ test.Run(context.Background(), func(t *pakostii.TestHandle) error {
 		if err != nil {
 			return err
 		}
-		// Although pakostii will automatically cleanup any ports it uses, you have control over when to close the port forwarding
+		// Although raijin will automatically cleanup any ports it uses, you have control over when to close the port forwarding
 		defer fw.Close()
 
 		// Create an endpoint URL for the etcd client to use
@@ -267,7 +266,7 @@ test.Run(context.Background(), func(t *pakostii.TestHandle) error {
 })
 ```
 
-This piece of code will ask pakostii to set up port forwarding by assigning a random local port that will forward traffic to `etcd1:2379` and `etcd2:2379`.
+This piece of code will ask raijin to set up port forwarding by assigning a random local port that will forward traffic to `etcd1:2379` and `etcd2:2379`.
 Using the port forwarding, we set up 2 etcd clients, one for each node.
 
 Without further ado, let's insert and get a value from etcd:
@@ -288,6 +287,7 @@ t.Logger.Info("got foo", "value", resp.Kvs[0].Value)
 ```
 
 Let's run the test again and look at the logs. Amongst other logs we've already seen, you should see a log line similar to the following:
+
 ```
 time=2026-05-10T11:57:36.626+03:00 level=INFO msg="got foo" test_id=dlarb value="bar"
 ```
@@ -310,14 +310,14 @@ err = isolation.Apply()
 if err != nil {
 	return err
 }
-// Same as with port forwarding, pakostii makes sure isolations are automatically healed after the test finishes,
+// Same as with port forwarding, raijin makes sure isolations are automatically healed after the test finishes,
 // But we always have the option to control when to stop the isolation for more complex scenarios.
 defer isolation.Heal()
 ```
 
 `IsolateAZ` accepts an arbitrary name for our isolation, as well as the name of the AZ to isolate. Since we have put `etcd1` in `az1`, and `etcd2` and `etcd3` in `az2`,
 we can easily isolate `etcd1` from the cluster by applying isolation to `az1`.
-By default, pakostii completely isolates a node, meaning even port forwards will not work for isolated nodes, to fix that, we explicitly allow outside network access for our etcd clients
+By default, raijin completely isolates a node, meaning even port forwards will not work for isolated nodes, to fix that, we explicitly allow outside network access for our etcd clients
 via `WithNetworkAccess()`.
 
 Let's put isolation code after our first etcd writes and reads, and update `foo` using the second client that talks to `etcd2`:
@@ -329,7 +329,7 @@ err = isolation.Apply()
 if err != nil {
 	return err
 }
-// Same as with port forwarding, pakostii makes sure isolations are automatically healed after the test finishes,
+// Same as with port forwarding, raijin makes sure isolations are automatically healed after the test finishes,
 // But we always have the option to control when to stop the isolation for more complex scenarios.
 defer isolation.Heal()
 
@@ -367,7 +367,7 @@ time=2026-05-10T12:34:35.261+03:00 level=INFO msg="updated foo=baz in az2" test_
 {"level":"warn","ts":"2026-05-10T12:34:42.262371+0300","logger":"etcd-client","caller":"v3@v3.6.11/retry_interceptor.go:68","msg":"retrying of unary invoker failed","target":"etcd-endpoints://0x2425304503c0/localhost:35485","peer":"Peer{Addr: '[::1]:35485', LocalAddr: '[::1]:58560', AuthInfo: 'insecure'}","method":"/etcdserverpb.KV/Range","attempt":0,"error":"rpc error: code = Unavailable desc = etcdserver: request timed out"}
 {"level":"warn","ts":"2026-05-10T12:34:49.289306+0300","logger":"etcd-client","caller":"v3@v3.6.11/retry_interceptor.go:68","msg":"retrying of unary invoker failed","target":"etcd-endpoints://0x2425304503c0/localhost:35485","peer":"Peer{Addr: '[::1]:35485', LocalAddr: '[::1]:58560', AuthInfo: 'insecure'}","method":"/etcdserverpb.KV/Range","attempt":1,"error":"rpc error: code = Unavailable desc = etcdserver: request timed out"}
 {"level":"warn","ts":"2026-05-10T12:34:56.315866+0300","logger":"etcd-client","caller":"v3@v3.6.11/retry_interceptor.go:68","msg":"retrying of unary invoker failed","target":"etcd-endpoints://0x2425304503c0/localhost:35485","peer":"Peer{Addr: '[::1]:35485', LocalAddr: '[::1]:58560', AuthInfo: 'insecure'}","method":"/etcdserverpb.KV/Range","attempt":2,"error":"rpc error: code = Unavailable desc = etcdserver: request timed out"}
-time=2026-05-10T12:34:56.334+03:00 level=INFO msg="artifacts collected" test_id=kbkrq destination=.pakostii/etcd_stale_read-kbkrq
+time=2026-05-10T12:34:56.334+03:00 level=INFO msg="artifacts collected" test_id=kbkrq destination=.raijin/etcd_stale_read-kbkrq
 time=2026-05-10T12:34:56.334+03:00 level=INFO msg="tearing down runtime" test_id=kbkrq
 time=2026-05-10T12:34:56.421+03:00 level=INFO msg="containers tore down" test_id=kbkrq
 time=2026-05-10T12:34:56.426+03:00 level=INFO msg="network tore down" test_id=kbkrq
@@ -377,6 +377,7 @@ time=2026-05-10T12:34:56.426+03:00 level=ERROR msg="test failed" error="etcdserv
 This happens because etcd client reads are linearizable, which means the node must sync its state with the cluster before responding to the client.
 
 From etcd [documentation](https://etcd.io/docs/v3.5/learning/api_guarantees):
+
 > etcd ensures linearizability for all other operations by default.
 > Linearizability comes with a cost, however, because linearized requests must go through the Raft consensus process.
 > To obtain lower latencies and higher throughput for read requests, clients can configure a request’s consistency mode to serializable, which may access stale data with respect to quorum,
@@ -390,6 +391,7 @@ Since we have isolated `etcd1`, cluster sync will never happen. If you go to the
 ```
 
 ## Observing stale reads using serializable reads
+
 To avoid this built-in stale-read protection in etcd, we can use serializable reads. To do that, let's update our last get request from client A:
 
 ```go
@@ -406,10 +408,10 @@ time=2026-05-10T12:41:17.581+03:00 level=ERROR msg="test failed" error="expected
 
 That's it! We successfully set up an etcd cluster, isolated one node and got a stale read from it. Of course, we haven't found any bugs today,
 but we've learned about how etcd handles network issues and cluster split-brain scenarios. The example code has been simplified for clarity purposes,
-but you can find a more complete example in the [etcd stale read example](https://github.com/sotnii/pakostii/blob/main/examples/etcd_stale_read/main.go) in the pakostii's examples.
+but you can find a more complete example in the [etcd stale read example](https://github.com/sotnii/raijin/blob/main/examples/etcd_stale_read/main.go) in raijin's examples.
 
-You can also head over to [examples](/pakostii/examples) to see a full list of examples available in the pakostii repository,
-which will provide more details on APIs provided by pakostii.
+You can also head over to [examples](/raijin/examples) to see a full list of examples available in the raijin repository,
+which will provide more details on APIs provided by raijin.
 
 ## Full code
 
@@ -421,8 +423,8 @@ import (
   "fmt"
   "time"
 
-  "github.com/sotnii/pakostii"
-  "github.com/sotnii/pakostii/spec"
+  "github.com/sotnii/raijin"
+  "github.com/sotnii/raijin/spec"
   clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -460,9 +462,9 @@ func main() {
   }
 
   // Besides the cluster spec, each test needs a name that is used to identify test runs later.
-  test := pakostii.NewTest("etcd_stale_read", cluster)
+  test := raijin.NewTest("etcd_stale_read", cluster)
 
-  test.Run(context.Background(), func(t *pakostii.TestHandle) error {
+  test.Run(context.Background(), func(t *raijin.TestHandle) error {
       clients := make([]*clientv3.Client, 2)
     for _, host := range []string{"etcd1", "etcd2"} {
       fw, err := t.Network().ForwardPort(host, 2379)
@@ -473,7 +475,7 @@ func main() {
       if err != nil {
         return err
       }
-      // Although pakostii will automatically cleanup any ports it uses, you have control over when to close the port forwarding
+      // Although raijin will automatically cleanup any ports it uses, you have control over when to close the port forwarding
       defer fw.Close()
 
       // Create an endpoint URL for the etcd client to use
@@ -511,7 +513,7 @@ func main() {
     if err != nil {
       return err
     }
-    // Same as with port forwarding, pakostii makes sure isolations are automatically healed after the test finishes,
+    // Same as with port forwarding, raijin makes sure isolations are automatically healed after the test finishes,
     // But we always have the option to control when to stop the isolation for more complex scenarios.
     defer isolation.Heal()
 

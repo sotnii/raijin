@@ -1,4 +1,4 @@
-package pakostii
+package raijin
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sotnii/pakostii/logging"
+	"github.com/sotnii/raijin/logging"
 )
 
 type Test struct {

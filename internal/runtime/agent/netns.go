@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/spec"
 )
 
 type HttpResult struct {

@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/spec"
 )
 
 func redisContainer(image, host string) spec.ContainerSpec {

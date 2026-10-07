@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/sotnii/pakostii/internal/network"
-	"github.com/sotnii/pakostii/internal/runtime/agent"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin/internal/network"
+	"github.com/sotnii/raijin/internal/runtime/agent"
+	"github.com/sotnii/raijin/spec"
 )
 
 var (

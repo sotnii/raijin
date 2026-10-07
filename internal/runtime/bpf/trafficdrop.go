@@ -12,7 +12,7 @@ import (
 	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/link"
 	"github.com/cilium/ebpf/ringbuf"
-	"github.com/sotnii/pakostii/internal/runtime/bpf/assets"
+	"github.com/sotnii/raijin/internal/runtime/bpf/assets"
 )
 
 type TrafficDrop struct {

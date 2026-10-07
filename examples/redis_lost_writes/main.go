@@ -14,8 +14,8 @@ import (
 	"github.com/lmittmann/tint"
 	"github.com/redis/go-redis/v9"
 	redislogging "github.com/redis/go-redis/v9/logging"
-	"github.com/sotnii/pakostii"
-	"github.com/sotnii/pakostii/spec"
+	"github.com/sotnii/raijin"
+	"github.com/sotnii/raijin/spec"
 )
 
 const (
@@ -45,15 +45,15 @@ func main() {
 			))
 	}
 
-	test := pakostii.NewTest(
+	test := raijin.NewTest(
 		"redis_lost_writes",
 		cluster,
-		pakostii.WithLogger(slog.New(tint.NewHandler(os.Stdout, &tint.Options{
+		raijin.WithLogger(slog.New(tint.NewHandler(os.Stdout, &tint.Options{
 			Level: slog.LevelInfo,
 		}))),
 	)
 
-	test.Run(context.Background(), func(t *pakostii.TestHandle) error {
+	test.Run(context.Background(), func(t *raijin.TestHandle) error {
 		t.Logger.Info("waiting for redis and sentinel startup")
 		time.Sleep(5 * time.Second)
 
@@ -121,7 +121,7 @@ func main() {
 	})
 }
 
-func forwardRedisPorts(t *pakostii.TestHandle) (map[string]string, error) {
+func forwardRedisPorts(t *raijin.TestHandle) (map[string]string, error) {
 	forwardedAddrs := make(map[string]string, len(redisHosts)*2)
 
 	for _, node := range redisHosts {
