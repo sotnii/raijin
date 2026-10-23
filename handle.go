@@ -4,10 +4,10 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/sotnii/raijin/internal/runtime/agent"
-	"github.com/sotnii/raijin/internal/runtime/api"
-	"github.com/sotnii/raijin/internal/runtime/api/network"
-	"github.com/sotnii/raijin/internal/runtime/managers"
+	"github.com/sotnii/raijin/internal/agent"
+	"github.com/sotnii/raijin/internal/api"
+	"github.com/sotnii/raijin/internal/api/network"
+	"github.com/sotnii/raijin/internal/managers"
 	"github.com/sotnii/raijin/spec"
 )
 

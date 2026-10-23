@@ -94,12 +94,7 @@ func (s *signalState) set(sig os.Signal) {
 	}
 }
 
-func (s *signalState) get() os.Signal {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	return s.sig
-}
-
+// TODO: Test lifecycle / cleanup, panic handling, DI signal watcher
 func NewTestExecutor(
 	name string,
 	cluster spec.ClusterSpec,
@@ -274,7 +269,7 @@ func (e *TestExecutor) finalize(result *TestResult, cancel context.CancelFunc) {
 // 		return TestResult{}
 // 	}
 // 	if sig := sigState.get(); sig != nil {
-// 		return TestResult{ErrorMessage: fmt.Errorf("%w: %s", runtime.ErrTestCancelled, sig.String()).Error()}
+// 		return TestResult{ErrorMessage: fmt.Errorf("%w: %s", testerrors.ErrTestCancelled, sig.String()).Error()}
 // 	}
 // 	return TestResult{ErrorMessage: err.Error()}
 // }

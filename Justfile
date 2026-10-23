@@ -1,9 +1,16 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
-bpfAssetsDir := "./internal/runtime/bpf/assets"
+bpfAssetsDir := "./internal/bpf/assets"
 
 lint:
     golangci-lint run
+
+
+test:
+    go test ./...
+
+coverage:
+    go test -coverprofile=coverage.out ./...
 
 # Needs bpf-linker
 bpf:

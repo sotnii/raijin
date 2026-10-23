@@ -3,3 +3,4 @@
 .build
 bpf/target
 .DS_Store
+coverage.out

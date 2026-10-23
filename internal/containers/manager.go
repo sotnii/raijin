@@ -20,7 +20,7 @@ import (
 	"github.com/containerd/errdefs"
 	"github.com/containerd/typeurl/v2"
 	"github.com/opencontainers/runtime-spec/specs-go"
-	"github.com/sotnii/raijin/internal/runtime/common"
+	"github.com/sotnii/raijin/internal/cleanup"
 )
 
 type Config struct {
@@ -81,7 +81,7 @@ func (m *manager) RunContainer(ctx context.Context, req LaunchRequest) (*Running
 	}
 	m.logger.Debug("image ready", "container_id", req.ID, "image", image.Name())
 
-	var cleanup common.CleanupStack
+	var cleanup cleanup.CleanupStack
 	defer cleanup.Run()
 
 	bundleDir, mounts, err := m.prepareFiles(req.ID, req.Files)

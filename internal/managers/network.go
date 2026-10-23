@@ -8,7 +8,7 @@ import (
 	"net"
 
 	"github.com/sotnii/raijin/internal/network"
-	"github.com/sotnii/raijin/internal/runtime/util"
+	"github.com/sotnii/raijin/internal/util"
 	"github.com/sotnii/raijin/spec"
 )
 

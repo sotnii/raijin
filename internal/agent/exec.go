@@ -1,7 +1,7 @@
 package agent
 
 import (
-	"github.com/sotnii/raijin/internal/runtime/util"
+	"github.com/sotnii/raijin/internal/util"
 	"github.com/vishvananda/netns"
 )
 

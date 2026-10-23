@@ -8,7 +8,7 @@ import (
 
 type ClusterSpec = spec.ClusterSpec
 
-type RuntimeFactory func(name string, cluster spec.ClusterSpec, runtimeDeps TestExecutorDeps, logger *slog.Logger) (*TestExecutor, error)
+type ExecutorFactory func(name string, cluster spec.ClusterSpec, runtimeDeps TestExecutorDeps, logger *slog.Logger) (*TestExecutor, error)
 
 type TestOption func(*Test)
 

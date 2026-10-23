@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sotnii/raijin/internal/runtime/agent"
+	"github.com/sotnii/raijin/internal/agent"
 )
 
 type Http struct {

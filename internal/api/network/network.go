@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"net"
 
+	"github.com/sotnii/raijin/internal/agent"
 	"github.com/sotnii/raijin/internal/network"
-	"github.com/sotnii/raijin/internal/runtime/agent"
 	"github.com/sotnii/raijin/spec"
 )
 

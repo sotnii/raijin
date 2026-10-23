@@ -7,21 +7,22 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/sotnii/raijin/internal/backend"
-	"github.com/sotnii/raijin/internal/backend/node"
+	"github.com/sotnii/raijin/internal/runtime"
+	"github.com/sotnii/raijin/internal/runtime/node"
 	"github.com/sotnii/raijin/spec"
 )
 
 type NodeController struct {
 	logger      *slog.Logger
-	nodeFactory backend.NodeFactory
+	nodeFactory runtime.NodeFactory
 
 	nodes map[spec.NodeID]node.Node
 
 	mu sync.Mutex
 }
 
-func NewNodeController(factory backend.NodeFactory, logger *slog.Logger) *NodeController {
+// TODO: Test
+func NewNodeController(factory runtime.NodeFactory, logger *slog.Logger) *NodeController {
 	return &NodeController{
 		logger:      logger,
 		nodes:       make(map[spec.NodeID]node.Node),

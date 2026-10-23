@@ -7,20 +7,21 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sotnii/raijin/internal/backend"
-	"github.com/sotnii/raijin/internal/backend/containerd"
 	"github.com/sotnii/raijin/internal/controllers"
-	"github.com/sotnii/raijin/internal/runtime/util"
+	"github.com/sotnii/raijin/internal/runtime"
+	"github.com/sotnii/raijin/internal/runtime/containers"
+	"github.com/sotnii/raijin/internal/util"
 	"github.com/sotnii/raijin/logging"
 )
 
+// TODO: Test running
 type Test struct {
 	id          string
 	name        string
 	clusterSpec ClusterSpec
 	logger      *slog.Logger
-	executor    RuntimeFactory
-	backend     backend.RuntimeBackend
+	executor    ExecutorFactory
+	runtime     runtime.Runtime
 }
 
 func NewTest(name string, cluster *ClusterSpec, opts ...TestOption) *Test {
@@ -35,16 +36,18 @@ func NewTest(name string, cluster *ClusterSpec, opts ...TestOption) *Test {
 		clusterSpec: *cluster,
 		logger:      logging.NewDefaultLogger(),
 		executor:    NewTestExecutor,
-		backend:     containerd.NewContainerdOnHostBackend(),
 	}
 	for _, opt := range opts {
 		opt(t)
 	}
+	t.runtime = containers.NewContainersRuntime(t.logger)
+
 	return t
 }
 
 func (t *Test) executorDeps() TestExecutorDeps {
-	nc := controllers.NewNodeController(t.backend.NodeFactory(), t.logger.With("component", "node_controller"))
+	// TODO: introduce node controller factory
+	nc := controllers.NewNodeController(t.runtime.NodeFactory(), t.logger.With("component", "node_controller"))
 
 	return TestExecutorDeps{
 		NodeController: nc,
@@ -74,7 +77,7 @@ func prettyTestErrors(testErrors []TestError) string {
 			b.WriteString("\n\n")
 		}
 		fmt.Fprintf(&b, "Error %d:\n", i+1)
-		for _, line := range strings.Split(testError.Err.Error(), "\n") {
+		for line := range strings.SplitSeq(testError.Err.Error(), "\n") {
 			fmt.Fprintf(&b, "  %s\n", line)
 		}
 		if trace := prettyStackTrace(testError.StackTrace); trace != "" {

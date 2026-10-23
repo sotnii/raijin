@@ -1,4 +1,4 @@
-package common
+package cleanup
 
 type CleanupStack struct {
 	fns []func()
