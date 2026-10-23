@@ -49,7 +49,7 @@ func main() {
 		"redis_lost_writes",
 		cluster,
 		raijin.WithLogger(slog.New(tint.NewHandler(os.Stdout, &tint.Options{
-			Level: slog.LevelInfo,
+			Level: slog.LevelDebug,
 		}))),
 	)
 
